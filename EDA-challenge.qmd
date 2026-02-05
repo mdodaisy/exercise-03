@@ -1,0 +1,222 @@
+---
+title: "EDA-challenge"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+### Load in required packages
+
+```{r, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+### Load in the dataset
+
+```{r}
+
+f <- "https://raw.githubusercontent.com/difiore/ada-datasets/main/data-wrangling.csv"
+d <- read_csv(f, col_names = TRUE)
+names(d)
+```
+
+# Challenge #1
+
+## Create a new variable named *BSD* (body size dimorphism) which is the ratio of average male to female body mass.
+
+```{r}
+d <- d %>%
+  mutate(BSD = Body_mass_male_mean/Body_mass_female_mean)
+```
+
+# Challenge #2
+
+## Create a new variable named *sex_ratio*, which is the ratio of the number of adult females to adult males in a typical group.
+
+```{r}
+d <- d %>%
+  mutate(sex_ratio = AdultFemale/AdultMales)
+```
+
+# Challenge #3
+
+## Create a new variable named *DI* (defensibility index), which is the ratio of day range length to the diameter of the home range.
+
+```{r}
+d <- d %>%
+  mutate(DI = DayLength_km/(sqrt(HomeRange_km2/pi)))
+```
+
+# Challenge #4
+
+## Plot the relationship between day range length and time spent moving for these primate species overall *and* by family.
+
+```{r}
+day_time_plot <- d %>%
+  ggplot(aes(x = Move, y = DayLength_km, color = factor(Family), group = 1)) +
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm", fullrange = FALSE, se = FALSE, color = "black", na.rm = TRUE) +
+  theme_classic() +
+  xlab("Time Spent Moving") +
+  ylab("Day Range Length")
+day_time_plot
+
+day_time_plot_family <- d %>%
+  ggplot(aes(x = Move, y = DayLength_km, color = factor(Family))) +
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm", fullrange = FALSE, se = FALSE, na.rm = TRUE) +
+  theme_classic() +
+  xlab("Time Spent Moving") +
+  ylab("Day Range Length") +
+  labs(color = "Family") +
+  facet_wrap(. ~ Family) 
+day_time_plot_family
+```
+
+Species that spend more time moving *do* travel farther overall as there is a positive trend line. The Daubentonidae and Lorisidae are the only families that exhibit this trend.
+
+To see if the data should be log transformed, we can create a histogram of the data.
+
+```{r}
+d %>%
+  mutate(DayLength_km = as.numeric(DayLength_km), na.rm = TRUE) %>%
+  mutate(Move = as.numeric(Move), na.rm = TRUE) # changing the class of the variables to numeric
+
+par(mfrow = c(2,2))
+hist(d$DayLength_km)
+hist(d$Move)
+hist(log(d$DayLength_km))
+hist(log(d$Move))
+```
+
+As seen in the histograms, both variables should be transformed.
+
+```{r}
+day_time_plot_transformed <- d %>%
+  ggplot(aes(x = log(Move), y = log(DayLength_km), color = factor(Family), group = 1)) +
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm", fullrange = FALSE, se = FALSE, na.rm = TRUE, color = "black") +
+  theme_classic() +
+  xlab("log(Time Spent Moving)") +
+  ylab("log(Day Range Length)") +
+  labs(color = "Family")
+day_time_plot_transformed
+```
+
+This is a much nicer plot!
+
+# Challenge #5
+
+## Plot the relationship between day range length and group size overall and by family.
+
+```{r}
+day_group_plot <- d %>%
+  ggplot(aes(x = MeanGroupSize, y = DayLength_km, color = factor(Family), group = 1)) +
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm", fullrange = FALSE, se = FALSE, na.rm = TRUE, color = "black") +
+  theme_classic() +
+  xlab("Mean Group Size") +
+  ylab("Time Spent Moving") +
+  labs(color = "Family")
+day_group_plot
+
+day_group_plot_family <- d %>%
+   ggplot(aes(x = MeanGroupSize, y = DayLength_km, color = factor(Family))) +
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm", fullrange = FALSE, se = FALSE, na.rm = TRUE) +
+  theme_classic() +
+  xlab("Mean Group Size") +
+  ylab("Time Spent Moving") +
+  labs(color = "Family") +
+  facet_wrap(. ~ Family)
+day_group_plot_family
+```
+
+Species that live in larger groups *do* travel farther overall. The Atelidae, Cebidae, Cercopithecidae, Lepilemuridae, and Pitheciidae families exhibit this trend.
+
+Checking to see if the data needs to be transformed.
+
+```{r}
+par(mfrow = c(1,2))
+hist(d$MeanGroupSize)
+hist(log(d$MeanGroupSize))
+```
+
+Based on this, I think that both variables should be transformed.
+
+# Challenge #6
+
+## Plot the overall relationship between canine size dimorphism and body size dimorphism overall and by family.
+
+```{r}
+canine_BSD_plot <- d %>%
+  ggplot(aes(x = BSD, y = Canine_Dimorphism, color = factor(Family), group = 1)) +
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm", se = FALSE, fullrange = FALSE, na.rm = TRUE, color = "black") +
+  theme_classic() +
+  xlab("Body Size Dimorphism") +
+  ylab("Canine Dimorphism") +
+  labs(color = "Family")
+canine_BSD_plot
+
+canine_BSD_plot_family <- d %>%
+   ggplot(aes(x = BSD, y = Canine_Dimorphism, color = factor(Family))) +
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm", se = FALSE, fullrange = FALSE, na.rm = TRUE) +
+  theme_classic() +
+  xlab("Body Size Dimorphism") +
+  ylab("Canine Dimorphism") +
+  labs(color = "Family") +
+  facet_wrap(. ~ Family)
+canine_BSD_plot_family
+```
+
+Taxa with greater size dimorphism *do* show greater canine dimorphism.
+
+# Challenge #7
+
+## Create a new variable named *diet_strategy* that is "frugivore" if fruits make up \>50% of the diet, "foliovore" if leaves make up \>50% of the diet, and "omnivore" if diet data are available, but neither of these are true.
+
+```{r}
+d <- d %>%
+  mutate(diet_strategy = case_when(Fruit > 50 ~ "frugivore", Leaves > 50 ~ "foliovore", Fruit < 50 & Leaves < 50 ~ "omnivore", TRUE ~ NA))
+```
+
+## Then, make boxplots of group size for species with different dietary strategies, omitting the category NA from the plot.
+
+```{r, warning = FALSE}
+group_diet_boxplots <- d %>%
+  filter(diet_strategy != "NA") %>%
+  ggplot(aes(x = diet_strategy, y = MeanGroupSize)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  theme_classic() +
+  xlab("Diet Strategy") +
+  ylab("Mean Group Size")
+group_diet_boxplots
+```
+
+Frugivores *do* live in larger groups than foliovores.
+
+# Challenge 8
+
+## In one line of code, do the following:
+
+-   Add a variable, *binomial*, to the data frame d, which is a concatenation of the Genus and Species variables
+-   Trim the data frame to only include the variables: Binomial, Family, Brain_size_species_mean, and Body_mass_male_mean
+-   Group these variables by Family
+-   Calculate the average value for Brain_size_species_mean and Body_mass_male_mean per Family
+-   Arrange by increasing average brain size
+-   print the output to the console
+
+```{r}
+(d %>%
+  mutate(Binomial = paste(Genus, Species, sep = " ")) %>%
+  select(Binomial, Family, Brain_Size_Species_Mean, Body_mass_male_mean) %>%
+  group_by(Family) %>%
+  summarise(mean.brain.size = mean(Brain_Size_Species_Mean, na.rm = TRUE),
+            mean.body.mass = mean(Body_mass_male_mean, na.rm = TRUE)) %>%
+  arrange(mean.brain.size))
+```
