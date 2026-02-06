@@ -161,7 +161,7 @@ dbl (17): Brain_Size_Species_Mean, Body_mass_male_mean, Body_mass_female_mea...
 <h2 class="anchored" data-anchor-id="create-a-new-variable-named-di-defensibility-index-which-is-the-ratio-of-day-range-length-to-the-diameter-of-the-home-range.">Create a new variable named <em>DI</em> (defensibility index), which is the ratio of day range length to the diameter of the home range.</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DI =</span> DayLength_km<span class="sc">/</span>(<span class="fu">sqrt</span>(HomeRange_km2<span class="sc">/</span>pi)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DI =</span> DayLength_km<span class="sc">/</span>((<span class="fu">sqrt</span>(HomeRange_km2<span class="sc">/</span>pi))<span class="sc">*</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>

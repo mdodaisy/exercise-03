@@ -46,7 +46,7 @@ d <- d %>%
 
 ```{r}
 d <- d %>%
-  mutate(DI = DayLength_km/(sqrt(HomeRange_km2/pi)))
+  mutate(DI = DayLength_km/((sqrt(HomeRange_km2/pi))*2))
 ```
 
 # Challenge #4
