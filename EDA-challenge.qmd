@@ -75,7 +75,7 @@ day_time_plot_family <- d %>%
 day_time_plot_family
 ```
 
-Species that spend more time moving *do* travel farther overall as there is a positive trend line. The Daubentonidae and Lorisidae are the only families that exhibit this trend.
+Species that spend more time moving *do* travel farther overall as there is a weak positive trend line. The Atelidae and Hylobatidae are the only families that exhibit this trend.
 
 To see if the data should be log transformed, we can create a histogram of the data.
 
@@ -91,7 +91,7 @@ hist(log(d$DayLength_km))
 hist(log(d$Move))
 ```
 
-As seen in the histograms, both variables should be transformed.
+As seen in the histograms, both variables should be transformed to achieve a more normal distribution.
 
 ```{r}
 day_time_plot_transformed <- d %>%
@@ -134,7 +134,7 @@ day_group_plot_family <- d %>%
 day_group_plot_family
 ```
 
-Species that live in larger groups *do* travel farther overall. The Atelidae, Cebidae, Cercopithecidae, Lepilemuridae, and Pitheciidae families exhibit this trend.
+Species that live in larger groups *do* travel farther overall as there is a strong positive trendline. The Atelidae, Cebidae, Cercopithecidae, Lepilemuridae, and Pitheciidae families exhibit this trend.
 
 Checking to see if the data needs to be transformed.
 
@@ -191,14 +191,13 @@ group_diet_boxplots <- d %>%
   filter(diet_strategy != "NA") %>%
   ggplot(aes(x = diet_strategy, y = MeanGroupSize)) +
   geom_boxplot() +
-  geom_jitter(width = 0.2, alpha = 0.5) +
   theme_classic() +
   xlab("Diet Strategy") +
   ylab("Mean Group Size")
 group_diet_boxplots
 ```
 
-Frugivores *do* live in larger groups than foliovores.
+Based on the boxplots, I don't think there is enough evidence to tell whether frugivores or foliovores are larger than one another. However, there are some outlier frugivore individuals that suggest that the group may be larger than foliovores.
 
 # Challenge 8
 
